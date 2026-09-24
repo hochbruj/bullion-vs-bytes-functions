@@ -12,8 +12,18 @@ module.exports = {
   env: {
     node: true,
   },
+  settings: {
+    // eslint-import-resolver-node doesn't understand package.json "exports" maps, which
+    // firebase-functions v7's v2/* subpaths rely on — the typescript resolver does.
+    'import/resolver': {
+      typescript: true,
+    },
+  },
   rules: {
     '@typescript-eslint/no-non-null-assertion': 'off',
+    // False positives on firebase-admin's namespace export (conditional exports confuse this
+    // rule's static analysis) — admin.initializeApp/firestore etc. are real, working exports.
+    'import/namespace': 'off',
     'import/order': [
       'error',
       {

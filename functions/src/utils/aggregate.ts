@@ -74,7 +74,11 @@ export const aggregateMonth = async (
     BBGLD: lastDoc.BBGLD,
   };
 
-  // Write to monthlyPrices collection
-  await db.collection('monthlyPrices').doc(monthKey).set(monthlyPrice);
+  // Write to monthlyPrices collection. Merge rather than overwrite — the same doc may already
+  // carry real estate fields written independently by saveRealEstatePrices.
+  await db
+    .collection('monthlyPrices')
+    .doc(monthKey)
+    .set(monthlyPrice, { merge: true });
   console.log(`Aggregated prices for ${monthKey}`);
 };

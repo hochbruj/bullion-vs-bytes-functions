@@ -42,25 +42,25 @@ export const getPerformanceData = async (): Promise<PriceData> => {
 
   const lastUpdated = dailyDocs[dailyDocs.length - 1].data().timestamp;
 
-  // Fetch all monthly prices for chart data (84 documents over 7 years)
+  // Monthly prices for the last 10 years (the longest period the frontend shows). The collection
+  // reaches back to 1983 for real estate, which would bloat every response.
+  const now = new Date();
+  const monthlyStart = `${now.getUTCFullYear() - 10}-${String(
+    now.getUTCMonth() + 1,
+  ).padStart(2, '0')}`;
   const monthlyDocs = (
-    await db.collection('monthlyPrices').orderBy('month', 'asc').get()
+    await db
+      .collection('monthlyPrices')
+      .where('month', '>=', monthlyStart)
+      .orderBy('month', 'asc')
+      .get()
   ).docs;
 
-  const monthlyChartData: MonthlyRates[] = monthlyDocs.map((doc) => {
-    const data = doc.data();
-    return {
-      month: data.month,
-      ETH: data.ETH,
-      BTC: data.BTC,
-      AG: data.AG,
-      AU: data.AU,
-      SPY: data.SPY,
-      BTGLD: data.BTGLD,
-      YPGLD: data.YPGLD,
-      BBGLD: data.BBGLD,
-    } as MonthlyRates;
-  });
+  // Spread rather than whitelist fields, so new instruments (e.g. real estate cities) show up
+  // without touching this mapping again — monthlyPrices docs only ever contain known Rates keys.
+  const monthlyChartData: MonthlyRates[] = monthlyDocs.map(
+    (doc) => doc.data() as MonthlyRates,
+  );
 
   // Add current month's data from dailyRates (most recent values)
   const lastMonthlyRates = {
@@ -80,7 +80,6 @@ export const getPerformanceData = async (): Promise<PriceData> => {
   monthlyChartData.push(lastMonthlyRates);
 
   // Fetch daily prices for the last 90 days, sampling every 2 days (45 documents)
-  const now = new Date();
   const endDate = now.toISOString().split('T')[0]; // e.g., "2025-04-28"
   const startDate = new Date(now);
   startDate.setDate(now.getDate() - 90);
