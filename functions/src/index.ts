@@ -66,7 +66,7 @@ export const getPerformance = onRequest(async (req, res) => {
   }
 });
 
-// export const test = onRequest({ ...RUNTIME_OPTS }, async (req, res) => {
-//   await saveRealEstatePrices();
-//   res.send('OK');
-// });
+export const test = onRequest({ ...RUNTIME_OPTS }, async (req, res) => {
+  await savePrices();
+  res.send('OK');
+});
