@@ -3,7 +3,7 @@ import axios from 'axios';
 import { CryptoRates } from '../types/rates';
 
 export const getCryptoRates = async (): Promise<CryptoRates> => {
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin,kinesis-silver,tether-gold&vs_currencies=usd`;
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin,kinesis-silver,tether-gold&vs_currencies=usd&x_cg_demo_api_key=${process.env.COINGECKO_API_KEY}`;
   const result = await axios.get(url);
   return {
     BTC: result.data.bitcoin.usd,

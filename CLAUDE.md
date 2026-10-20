@@ -116,7 +116,7 @@ Adding a city: add its key to `RealEstateRates` in `types/rates.ts`, add it to a
 - **Tiingo** — SPY price, 15-min delayed on free tier
 - **getfundvalue-6jf7yi4gba-uc.a.run.app** — separate Cloud Run service returning `BTGLD`/`YPGLD`/`BBGLD` fund values
 
-API keys come from `functions/.env` (`TIINGO_API_KEY`, `FRED_API_KEY`; gitignored) via `process.env` — the Firebase CLI bundles it on deploy and loads it in the emulator. `functions.config()` is no longer used; don't reintroduce it. FRED keys must be exactly 32 lowercase alphanumeric chars.
+API keys come from `functions/.env` (`TIINGO_API_KEY`, `FRED_API_KEY`, `COINGECKO_API_KEY`; gitignored) via `process.env` — the Firebase CLI bundles it on deploy and loads it in the emulator. `functions.config()` is no longer used; don't reintroduce it. FRED keys must be exactly 32 lowercase alphanumeric chars. `COINGECKO_API_KEY` is a Demo-tier key passed as `x_cg_demo_api_key` (CoinGecko's own free-tier param name, not an OAuth-style bearer token).
 
 ## Coding Conventions
 
