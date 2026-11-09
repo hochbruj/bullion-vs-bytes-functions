@@ -60,8 +60,30 @@ export const aggregateMonth = async (
     return;
   }
 
-  // Take the last document as the representative price for the month
-  const lastDoc = docs[docs.length - 1].data() as DailyPrice;
+  // Take the last *complete* document as the representative price for the month. A trailing day
+  // with a partial outage (e.g. CoinGecko down, SPY-only saved) would otherwise write `undefined`
+  // fields, which the Admin SDK throws on — silently dropping the whole aggregation for that month.
+  const requiredFields: (keyof DailyPrice)[] = [
+    'AG',
+    'AU',
+    'BTC',
+    'ETH',
+    'SPY',
+    'BTGLD',
+    'YPGLD',
+    'BBGLD',
+  ];
+  const lastCompleteDoc = docs
+    .map((doc) => doc.data() as DailyPrice)
+    .reverse()
+    .find((data) => requiredFields.every((field) => data[field] != null));
+
+  if (!lastCompleteDoc) {
+    console.log(`No complete day found for ${monthKey}`);
+    return;
+  }
+
+  const lastDoc = lastCompleteDoc;
   const monthlyPrice: MonthlyPrice = {
     month: monthKey,
     AG: lastDoc.AG,

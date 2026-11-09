@@ -133,7 +133,7 @@ API keys come from `functions/.env` (`TIINGO_API_KEY`, `FRED_API_KEY`, `COINGECK
 | `src/index.ts` | Function exports — scheduled jobs + HTTP endpoint |
 | `src/schedule/prices.ts` | Core write path: 30-min snapshots + once-daily history write |
 | `src/utils/rates.ts` | All external API integrations |
-| `src/utils/aggregate.ts` | Monthly rollup logic |
+| `src/utils/aggregate.ts` | Monthly rollup logic. Picks the last *complete* day in the month (not just the chronologically last doc) — a trailing day with a partial outage would otherwise write `undefined` fields, which the Admin SDK throws on, dropping the whole month's crypto/PM/SPY/fund aggregation silently (caught once for 2026-09, backfilled) |
 | `src/utils/realEstate.ts` / `src/utils/fx.ts` | Real estate sources list + gap-filling, and month-end FX rates (`src/scripts/backfillMonthly.ts` runs both over full history) |
 | `src/utils/perfromanceData.ts` | Builds the full API response consumed by the frontend, including performance % calculations |
 | `src/types/rates.ts` | Shared types — mirror any changes here on the frontend's expected response shape |
